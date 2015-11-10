@@ -58,7 +58,7 @@ class IntercomScriptTags extends ViewableData
 			if(defined('INTERCOM_SECRET_KEY')) {
 				$settings['user_hash'] = $this->generateUserHash($member->Email);
 			} else {
-
+				$settings['user_id'] = $member->ID;
 			}
 
 			if($this->config()->company_property) {

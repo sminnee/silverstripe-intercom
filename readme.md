@@ -55,6 +55,20 @@ Sminnee\SilverStripeIntercom\IntercomScriptTag:
  * `company_fields`: A map of Intercom field name to organisation properties to pass through
  * `user_fields`: A map of Intercom field name to member properties to pass through
 
+
+### Only show Intercom sometimes
+
+The `Sminnee\SilverStripeIntercom\IntercomScriptTags` class has a configuration value, `enabled`, that
+can will disable any inclusion of Intercom script tags if set to false.
+
+If you wish to show Intercom only sometimes, you can update this configuration value at any time during
+your page load, with the following command. For example, you may choose to show Intercom only on certain
+pages, or for certain users.
+
+```
+Sminnee\SilverStripeIntercom\IntercomScriptTags::config()->enabled = false;
+```
+
 ## Maintainers
  
  * Sam Minnée <sam@silverstripe.com>

@@ -12,8 +12,14 @@ use ViewableData;
 class IntercomScriptTags extends ViewableData
 {	
 
+	private static $enabled = true;
+
 	public function isEnabled() {
 		if(!defined('INTERCOM_APP_ID')) {
+			return false;
+		}
+
+		if(!$this->config()->enabled) {
 			return false;
 		}
 
@@ -41,6 +47,7 @@ class IntercomScriptTags extends ViewableData
 
 		if($member = Member::currentUser()) {
 			$settings['name'] = trim($member->FirstName . ' ' . $member->Surname);
+			$settings['email'] = $member->Email;
 			$settings['created_at'] = trim($member->FirstName . ' ' . $member->Surname);
 			$settings['created_at'] = $member->obj('Created')->Format('U');
 
@@ -50,6 +57,8 @@ class IntercomScriptTags extends ViewableData
 
 			if(defined('INTERCOM_SECRET_KEY')) {
 				$settings['user_hash'] = $this->generateUserHash($member->Email);
+			} else {
+
 			}
 
 			if($this->config()->company_property) {

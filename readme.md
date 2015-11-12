@@ -69,6 +69,22 @@ pages, or for certain users.
 Sminnee\SilverStripeIntercom\IntercomScriptTags::config()->enabled = false;
 ```
 
+## Usage
+
+### Tracking events
+
+You can track events with the `Intercom::trackEvent()` method. The event will be tracked against the
+current user.
+
+    $intercom = Injector::inst()->get('Sminnee\SilverStripeIntercom\Intercom');
+    $intercom->trackEvent('test-event', array(
+      'something' => 'a value',
+      'other-one' => 'moar data',
+    ));
+
+Note that you can't currently track events for anonymous visitors; a LogicException will be thrown if you 
+try.
+
 ## Maintainers
  
  * Sam Minnée <sam@silverstripe.com>

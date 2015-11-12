@@ -73,8 +73,6 @@ class IntercomScriptTags extends ViewableData
 					}
 				}
 			}
-
-			return $settings;
 		};
 
 

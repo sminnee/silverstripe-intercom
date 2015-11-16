@@ -27,6 +27,7 @@ The module will make use of the following global constants in your `_ss_environm
 set these up
 
  * `INTERCOM_APP_ID`: The "App ID" from Intercom's integration settings. Required.
+ * `INTERCOM_API_KEY`: The "API key" from Intercom's integration settings. Required.
  * `INTERCOM_SECRET_KEY`: The secret key given by Intercom's Secure Mode. Optional, but highly recommended.
 
 Note that if you disclose your secret key to anyone, they could impersonate users of your app and chat to 
@@ -81,6 +82,16 @@ current user.
       'something' => 'a value',
       'other-one' => 'moar data',
     ));
+
+You can also explicitly specify which user this event should be tracked against:
+ 
+ 	$member = Member::get()->byID(34);
+	$intercom = Injector::inst()->get('Sminnee\SilverStripeIntercom\Intercom');
+	$intercom->trackEvent('test-event', array(
+		'something' => 'a value',
+		'other-one' => 'moar data',
+	), $member);
+ 
 
 Note that you can't currently track events for anonymous visitors; a LogicException will be thrown if you 
 try.

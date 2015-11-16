@@ -14,7 +14,7 @@ class IntercomScriptTags extends ViewableData
 
 	private static $enabled = true;
 
-	public function isEnabled() {
+	public function isEnabled(Member $member = null) {
 		if(!defined('INTERCOM_APP_ID')) {
 			return false;
 		}
@@ -23,7 +23,11 @@ class IntercomScriptTags extends ViewableData
 			return false;
 		}
 
-		if(!$this->config()->anonymous_access && !Member::currentUserID()) {
+		if(!$member) {
+			$member = Member::currentUserID();
+		}
+
+		if(!$this->config()->anonymous_access && !$member) {
 			return false;
 		}
 
@@ -33,11 +37,13 @@ class IntercomScriptTags extends ViewableData
 	/**
 	 * Return the Intercom settings an array.
 	 * Extendable by adding extensions with updateIntercomSettings().
-	 * 
+	 *
+	 * @param Member $member - if not provided, it will try to Member::currentUser();
+	 *
 	 * @return array The settings, ready for JSON-encoding
 	 */
-	public function getIntercomSettings() {
-		if(!$this->isEnabled()) {
+	public function getIntercomSettings(Member $member = null) {
+		if(!$this->isEnabled($member)) {
 			return [];
 		}
 
@@ -45,7 +51,11 @@ class IntercomScriptTags extends ViewableData
 			'app_id' => INTERCOM_APP_ID,
 		];
 
-		if($member = Member::currentUser()) {
+		if(!$member) {
+			$member = Member::currentUser();
+		}
+
+		if($member) {
 			$settings['name'] = trim($member->FirstName . ' ' . $member->Surname);
 			$settings['email'] = $member->Email;
 			$settings['created_at'] = trim($member->FirstName . ' ' . $member->Surname);

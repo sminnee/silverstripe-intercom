@@ -4,7 +4,7 @@ namespace Sminnee\SilverStripeIntercom;
 
 use LogicException;
 use Intercom\IntercomBasicAuthClient;
-
+use Member;
 
 /**
  * Entry point for interaction with with Intercom.
@@ -60,18 +60,19 @@ class Intercom
 
 	/**
 	 * Track an event with the current user.
-	 * 
+	 *
 	 * @param  string $eventName Event name. Passed straight to intercom.
 	 * @param  array $eventData A map of event data. Passed straight to intercom.
+	 * @param Member $member - if not provided, it will try to use Member::currentUser();
 	 */
-	function trackEvent($eventName, $eventData = array()) {
+	function trackEvent($eventName, $eventData = array(), Member $member = null) {
 		$payload = array(
 			'event_name' => $eventName,
 			'created_at' => time(),
 		);
 
 		$scriptTags = new IntercomScriptTags();
-		$settings = $scriptTags->getIntercomSettings();
+		$settings = $scriptTags->getIntercomSettings($member);
 
 		if(empty($settings['email']) && empty($settings['user_id'])) {
 			throw new LogicException("Can't track event when no user logged in");

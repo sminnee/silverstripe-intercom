@@ -11,7 +11,7 @@ and help others make use of your modules.
 Install the module with composer, just like all your favourite module!
 
 ```
-composer require sminnee/intercom
+composer require sminnee/silverstripe-intercom
 ```
 
 ## License

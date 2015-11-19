@@ -40,7 +40,7 @@ you should use on your test and development environments.
 Your application can customise the information send with the following properties
 
 ````
-Sminnee\SilverStripeIntercom\IntercomScriptTag:
+Sminnee\SilverStripeIntercom\IntercomScriptTags:
   anonymous_access: true
   company_property: Organisation
   company_fields:

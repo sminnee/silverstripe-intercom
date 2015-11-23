@@ -3,7 +3,7 @@
     "description": "SilverStripe integration with Intercom.io",
     "type": "silverstripe-module",
     "require": {
-        "php": ">5.4.0",
+        "php": ">=5.4.0",
         "silverstripe/framework": "^3.1",
         "intercom/intercom-php": "^1.3"
     },

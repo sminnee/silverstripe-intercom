@@ -96,6 +96,35 @@ You can also explicitly specify which user this event should be tracked against:
 Note that you can't currently track events for anonymous visitors; a LogicException will be thrown if you 
 try.
 
+### Synchronising users via the API
+
+Sometimes, it's not enough to wait until users log in to have their Intercom data updated. For example, if
+you want to use Intercom to send emails you may want to update the Intercom database before the first email
+is sent.
+
+For this purpose, you can set `dev/tasks/IntercomBulkLoadTask` to run no a cronjob. By default it will
+synchronise all Member objects. If you wish to synchornise a reduced list of Members, you can set the
+`user_list` config option on the Intercom class. This should be of the form `%$ServiceName`, where ServiceName
+is the name of an Injector service.
+
+    Sminnee\SilverStripeIntercom\Intercom:
+      user_list: %$AllPlatformUsers
+    Injector:
+      AllPlatformUsers:
+        factory: AllUserListFactory
+
+In the preceding example, we're using a custom factory class called `AllUserListFactory` to define Member DataList.
+It needs to have a method called `create()` that returns a `DataList` of `Member`s.
+
+    /**
+     * Factory for generating a DataList of all platform users
+     */
+    class AllUserListFactory {
+      public function create($class, $params) {
+        return Member::get()->filter(['Some' => 'Value']);
+      }
+    }
+
 ## Maintainers
  
  * Sam Minnée <sam@silverstripe.com>

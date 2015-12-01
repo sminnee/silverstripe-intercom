@@ -120,7 +120,7 @@ class Intercom
 
 		$result = $this->getClient()->bulkUsers(['items' => $items]);
 
-		return new IntercomBulkJob($this->getClient(), $result->get('id'));
+		return $this->getBulkJob($result->get('id'));
 	}
 
 

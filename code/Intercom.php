@@ -83,9 +83,9 @@ class Intercom
 	 * @return IntercomBulkJob
 	 */
 	public function bulkLoadUsers(SS_List $members) {
-		$userFields = ['type', 'user_id', 'email', 'id', 'signed_up_at',  'created_at','name', 'last_seen_ip', 'custom_attributes', 'last_seen_user_agent', 'last_request_at', 'unsubscribed_from_emails', 'update_last_request_at', 'new_session', 'company'];
-		$companyFields = ['type', 'id', 'created_at', 'remote_created_at', 'updated_at', 'company_id', 'name', 'custom_attributes', 'session_count', 'monthly_spend', 'user_count', 'plan'];
-
+		$userFields = Config::inst()->get('Intercom','user_fields');
+		$companyFields = Config::inst()->get('Intercom','company_fields');
+		
 		$scriptTags = new IntercomScriptTags();
 
 		// Build the batch API submission

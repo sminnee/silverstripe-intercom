@@ -105,13 +105,29 @@ class IntercomFormExtension extends \DataExtension {
 		$userData = [];
 
 		foreach($this->intercomUserFieldMapping as $formField => $intercomField) {
-			$userData[$intercomField] = $this->owner->Fields()->dataFieldByName($formField)->dataValue();
+			$val = $this->owner->Fields()->dataFieldByName($formField)->dataValue();
+			if($intercomField === 'custom_attributes') {
+				if(!isset($userData['custom_attributes'])) $userData['custom_attributes'] = [];
+				$userData['custom_attributes'][$formField] = $val;
+			}
+			else {
+				$userData[$intercomField] = $val;	
+			}
+			
 		}
 
 		if(!empty($this->intercomCompanyFieldMapping)) {			
 			$companyData = [];
+			$val = $this->owner->Fields()->dataFieldByName($formField)->dataValue();
 			foreach($this->intercomCompanyFieldMapping as $formField => $intercomField) {
-				$companyData[$intercomField] = $this->owner->Fields()->dataFieldByName($formField)->dataValue();
+				if($intercomField === 'custom_attributes') {
+					if(!isset($companyData['custom_attributes'])) $companyData['custom_attributes'] = [];
+					$companyData['custom_attributes'][$formField] = $val;
+				}
+				else {
+					$companyData[$intercomField] = $val;	
+				}
+				
 			}
 			if(!isset($companyData['company_id'])) {
 				$companyData['company_id'] = time();
@@ -121,6 +137,7 @@ class IntercomFormExtension extends \DataExtension {
 		}
 
 		try {
+			$this->extend('beforeSendToIntercom', $userData);
 			$user = $intercom->getClient()->createUser($userData);
 
 			if(!empty($this->intercomNoteMapping)) {
@@ -144,6 +161,8 @@ class IntercomFormExtension extends \DataExtension {
 				catch (\Exception $e) {					
 					SS_Log::log("Could not create note: {$e->getMessage()}", SS_Log::WARN);
 				}
+
+				$this->extend('afterSendToIntercom', $userData);
 			}
 		}
 		catch (\Exception $e) {

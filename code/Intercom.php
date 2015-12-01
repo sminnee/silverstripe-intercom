@@ -69,8 +69,8 @@ class Intercom
 		if($userList = \Config::inst()->get('Intercom', 'user_list')) {
 			if(substr($userList,0,2) != '%$') {
 				throw new \InvalidArgumentException("Please set user_list to a string of the form %\$ServiceName");
-				return Injector::inst()->get(substr($userList, 2));
 			}
+			return Injector::inst()->get(substr($userList, 2));
 		}
 
 		// Default all users

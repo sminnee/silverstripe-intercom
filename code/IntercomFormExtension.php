@@ -2,13 +2,19 @@
 
 namespace Sminnee\SilverStripeIntercom;
 
+use SS_Log;
+use DataExtension;
+use LogicException;
+use Injector;
+use Exception;
+
 /**
  * Adds functionality to forms to integrate with Intercom
  *
  * @package  silverstripe/intercom
  * @author  Aaron Carlino <aaron@silverstripe.com>
  */
-class IntercomFormExtension extends \DataExtension {
+class IntercomFormExtension extends DataExtension {
 
 	/**
 	 * A map of form field names to Intercom user fields.
@@ -90,6 +96,28 @@ class IntercomFormExtension extends \DataExtension {
 	}
 
 	/**
+	 * Adds FormFieldName => IntercomName mappings to a given array.
+	 *
+	 * To map to a custom attribute, use $my_custom_attribute
+	 * 	
+	 * @param string $formField     The name of the form field
+	 * @param string $intercomField The name of the intercom field it maps to
+	 * @param array $data           The array of mappings to update
+	 */
+	protected function addMappings ($formField, $intercomField, $data) {		
+		$val = $this->owner->Fields()->dataFieldByName($formField)->dataValue();
+		if($intercomField[0] === '$') {
+			if(!isset($data['custom_attributes'])) $data['custom_attributes'] = [];
+			$data['custom_attributes'][substr($intercomField, 1)] = $val;
+		}
+		else {
+			$data[$intercomField] = $val;
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Sends the form data to Intercom, using the defined mappings
 	 */
 	public function sendToIntercom () {
@@ -98,36 +126,20 @@ class IntercomFormExtension extends \DataExtension {
 			empty($this->intercomNoteMapping) &&
 			empty($this->intercomCompanyFieldMapping)
 		) {
-			throw new \LogicException('You must define mapped fields to send a form submission to intercom, using Form::setIntercomFieldMapping() or Form::setIntercomNoteMapping()');
+			throw new LogicException('You must define mapped fields to send a form submission to intercom, using Form::setIntercomFieldMapping() or Form::setIntercomNoteMapping()');
 		}
 
-		$intercom = \Injector::inst()->get('Sminnee\SilverStripeIntercom\Intercom');
+		$intercom = Injector::inst()->get('Sminnee\SilverStripeIntercom\Intercom');
 		$userData = [];
 
 		foreach($this->intercomUserFieldMapping as $formField => $intercomField) {
-			$val = $this->owner->Fields()->dataFieldByName($formField)->dataValue();
-			if($intercomField === 'custom_attributes') {
-				if(!isset($userData['custom_attributes'])) $userData['custom_attributes'] = [];
-				$userData['custom_attributes'][$formField] = $val;
-			}
-			else {
-				$userData[$intercomField] = $val;	
-			}
-			
+			$userData = $this->addMappings($formField, $intercomField, $userData);			
 		}
 
 		if(!empty($this->intercomCompanyFieldMapping)) {			
 			$companyData = [];
-			$val = $this->owner->Fields()->dataFieldByName($formField)->dataValue();
 			foreach($this->intercomCompanyFieldMapping as $formField => $intercomField) {
-				if($intercomField === 'custom_attributes') {
-					if(!isset($companyData['custom_attributes'])) $companyData['custom_attributes'] = [];
-					$companyData['custom_attributes'][$formField] = $val;
-				}
-				else {
-					$companyData[$intercomField] = $val;	
-				}
-				
+				$companyData = $this->addMappings($formField, $intercomField, $companyData);				
 			}
 			if(!isset($companyData['company_id'])) {
 				$companyData['company_id'] = time();
@@ -137,11 +149,11 @@ class IntercomFormExtension extends \DataExtension {
 		}
 
 		try {
-			$this->extend('beforeSendToIntercom', $userData);
+			$this->owner->invokeWithExtensions('beforeSendToIntercom', $userData);
 			$user = $intercom->getClient()->createUser($userData);
 
 			if(!empty($this->intercomNoteMapping)) {
-				$noteData = $this->noteHeader;
+				$noteData = $this->intercomNoteHeader;
 				$noteData .= '<ul>';
 				foreach($this->intercomNoteMapping as $fieldName => $label) {
 					$noteData .= sprintf(
@@ -158,14 +170,14 @@ class IntercomFormExtension extends \DataExtension {
 						'user' => ['id' => $user['id']]
 					));					
 				}
-				catch (\Exception $e) {					
+				catch (Exception $e) {					
 					SS_Log::log("Could not create note: {$e->getMessage()}", SS_Log::WARN);
 				}
 
-				$this->extend('afterSendToIntercom', $userData);
+				$this->owner->invokeWithExtensions('afterSendToIntercom', $userData);
 			}
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			SS_Log::log("Could not create user: {$e->getMessage()}", SS_Log::WARN);
 		}
 	}

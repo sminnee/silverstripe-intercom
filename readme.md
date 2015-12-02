@@ -125,6 +125,59 @@ It needs to have a method called `create()` that returns a `DataList` of `Member
       }
     }
 
+### Integration with forms
+
+To send data to Intercom from a form, you can use `IntercomFormExtension`.
+
+```yaml
+Form:
+  extensions:
+    - 'Sminnee\SilverStripeIntercom\IntercomFormExtension'
+```
+
+This will provide several chainable methods to the `Form` class that help you map form fields to Intercom fields.
+
+```php
+$form->setIntercomUserFieldMapping([
+		'FullName' => 'name',
+		'EmailAddress' => 'email'
+	])
+	->setIntercomCompanyFieldMapping([
+		'CompanyName' => 'name'
+	])
+	->sendToIntercom();
+```
+
+For custom attributes, prefix the field name with `$`.
+
+```php
+$form->setIntercomUserFieldMapping([
+	'FavouriteColour' => '$favourite_color'
+]);
+```
+
+Additionally, you can stuff assorted fields into a monolithic "note" for the user in Intercom. This map is keyed with labels that should precede the values for each field.
+
+```php
+$form->setIntercomNoteMapping([
+		'SoftwareVersion' => 'The user is running version:'
+	])
+	->setIntercomNoteHeader('More information about this user');
+```
+
+The above will create a note similar to:
+
+```html
+<p>More information about this user</p>
+<ul>
+	<li>The user is running version: ${SoftwareVersion}</li>
+</ul>
+```
+
+#### Integration with Userforms
+
+See the [silverstripe-intercom-userforms](https://github.com/unclecheese/silverstripe-intercom-userforms) module by Uncle Cheese.
+
 ## Maintainers
  
  * Sam Minnée <sam@silverstripe.com>

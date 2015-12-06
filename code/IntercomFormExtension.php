@@ -17,7 +17,7 @@ use Exception;
 class IntercomFormExtension extends DataExtension {
 
 	/**
-	 * A map of form field names to Intercom user fields.
+	 * A map of form field names to Intercom lead fields.
 	 * [ 
 	 * 	'FirstName' => 'name',
 	 * 	'EmailAddress' => 'email'
@@ -130,10 +130,10 @@ class IntercomFormExtension extends DataExtension {
 		}
 
 		$intercom = Injector::inst()->get('Sminnee\SilverStripeIntercom\Intercom');
-		$userData = [];
+		$leadData = [];
 
 		foreach($this->intercomUserFieldMapping as $formField => $intercomField) {
-			$userData = $this->addMappings($formField, $intercomField, $userData);			
+			$leadData = $this->addMappings($formField, $intercomField, $leadData);			
 		}
 
 		if(!empty($this->intercomCompanyFieldMapping)) {			
@@ -145,17 +145,17 @@ class IntercomFormExtension extends DataExtension {
 				$companyData['company_id'] = time();
 			}
 
-			$userData['companies'] = [$companyData];
+			$leadData['companies'] = [$companyData];
 		}
 
 		try {
-			$this->owner->invokeWithExtensions('beforeSendToIntercom', $userData);
-			$user = $intercom->getClient()->createUser($userData);
+			$this->owner->invokeWithExtensions('beforeSendToIntercom', $leadData);
+			$lead = $intercom->getClient()->createContact($leadData);
 
 			if(!empty($this->intercomNoteMapping)) {
 				$noteData = $this->intercomNoteHeader;
 				$noteData .= '<ul>';
-				foreach($this->intercomNoteMapping as $fieldName => $label) {
+				foreach($this->intercomNoteMapping as $fieldName => $label) {					
 					$noteData .= sprintf(
 						'<li>%s: %s</li>',
 						$label,
@@ -167,14 +167,14 @@ class IntercomFormExtension extends DataExtension {
 				try {
 					$intercom->getClient()->createNote(array(
 						'body' => $noteData,
-						'user' => ['id' => $user['id']]
+						'user' => ['id' => $lead['user_id']]
 					));					
 				}
 				catch (Exception $e) {					
 					SS_Log::log("Could not create note: {$e->getMessage()}", SS_Log::WARN);
 				}
 
-				$this->owner->invokeWithExtensions('afterSendToIntercom', $userData);
+				$this->owner->invokeWithExtensions('afterSendToIntercom', $leadData);
 			}
 		}
 		catch (Exception $e) {

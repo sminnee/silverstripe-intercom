@@ -138,11 +138,11 @@ Form:
 This will provide several chainable methods to the `Form` class that help you map form fields to Intercom fields.
 
 ```php
-$form->setIntercomUserFieldMapping([
+$form->addIntercomUserFieldMapping([
 		'FullName' => 'name',
 		'EmailAddress' => 'email'
 	])
-	->setIntercomCompanyFieldMapping([
+	->addIntercomCompanyFieldMapping([
 		'CompanyName' => 'name'
 	])
 	->sendToIntercom();
@@ -151,7 +151,7 @@ $form->setIntercomUserFieldMapping([
 For custom attributes, prefix the field name with `$`.
 
 ```php
-$form->setIntercomUserFieldMapping([
+$form->addIntercomUserFieldMapping([
 	'FavouriteColour' => '$favourite_color'
 ]);
 ```
@@ -159,7 +159,7 @@ $form->setIntercomUserFieldMapping([
 Additionally, you can stuff assorted fields into a monolithic "note" for the user in Intercom. This map is keyed with labels that should precede the values for each field.
 
 ```php
-$form->setIntercomNoteMapping([
+$form->addIntercomNoteMapping([
 		'SoftwareVersion' => 'The user is running version:'
 	])
 	->setIntercomNoteHeader('More information about this user');

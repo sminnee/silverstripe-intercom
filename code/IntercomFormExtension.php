@@ -52,34 +52,76 @@ class IntercomFormExtension extends DataExtension {
 	protected $intercomNoteHeader = '';
 
 	/**
-	 * Sets the user field mapping
+	 * Adds mapping of form fields to intercom user fields
 	 * @param array
 	 * @return  Form
 	 */
-	public function setIntercomUserFieldMapping ($fields) {
-		$this->intercomUserFieldMapping = $fields;
+	public function addIntercomUserFieldMapping ($fields) {
+		$this->intercomUserFieldMapping = array_merge(
+			$this->intercomUserFieldMapping,
+			$fields
+		);
 
 		return $this->owner;
 	}
 
 	/**
-	 * Sets the company field mapping
-	 * @param array
-	 * @return  Form
+	 * Removes a form field to Intercom user field mapping
+	 * @param  string $key
+	 * @return Form
 	 */
-	public function setIntercomCompanyFieldMapping ($fields) {
-		$this->intercomCompanyFieldMapping = $fields;
+	public function removeIntercomUserFieldMapping ($key) {
+		unset($this->intercomUserFieldMapping[$key]);
 
 		return $this->owner;
 	}
 
 	/**
-	 * Sets the note field mapping
+	 * Adds mapping of form fields to intercom company fields
 	 * @param array
 	 * @return  Form
 	 */
-	public function setIntercomNoteMapping ($noteFields) {
-		$this->intercomNoteMapping = $noteFields;
+	public function addIntercomCompanyFieldMapping ($fields) {
+		$this->intercomCompanyFieldMapping = array_merge(
+			$this->intercomCompanyFieldMapping,
+			$fields
+		);
+
+		return $this->owner;
+	}
+
+	/**
+	 * Removes a form field to Intercom company field mapping
+	 * @param  string $key
+	 * @return Form
+	 */
+	public function removeIntercomCompanyFieldMapping ($key) {
+		unset($this->intercomCompanyFieldMapping[$key]);
+
+		return $this->owner;
+	}
+
+	/**
+	 * Adds mapping of note fields
+	 * @param array
+	 * @return  Form
+	 */
+	public function addIntercomNoteMapping ($noteFields) {
+		$this->intercomNoteMapping = array_merge(
+			$this->intercomNoteMapping,
+			$noteFields
+		);
+
+		return $this->owner;
+	}
+
+	/**
+	 * Removes a form field to Intercom company field mapping
+	 * @param  string $key
+	 * @return Form
+	 */
+	public function removeIntercomNoteFieldMapping ($key) {
+		unset($this->intercomNoteMapping[$key]);
 
 		return $this->owner;
 	}
@@ -165,12 +207,12 @@ class IntercomFormExtension extends DataExtension {
 				$noteData .= '</ul>';
 
 				try {
-					$intercom->getClient()->createNote(array(
+					$intercom->getClient()->createNote([
 						'body' => $noteData,
-						'user' => ['id' => $lead['user_id']]
-					));					
+						'user' => ['id' => $lead['id']]
+					]);	
 				}
-				catch (Exception $e) {					
+				catch (Exception $e) {
 					SS_Log::log("Could not create note: {$e->getMessage()}", SS_Log::WARN);
 				}
 

@@ -19,6 +19,8 @@ class RequestFilterTest extends SapphireTest {
 	protected $saved;
 
 	function setUp() {
+		if(!defined('INTERCOM_APP_ID')) define('INTERCOM_APP_ID', 'test');
+
 		$this->saved = array(
 			'script_tags_enabled' => IntercomScriptTags::config()->enabled,
 		);

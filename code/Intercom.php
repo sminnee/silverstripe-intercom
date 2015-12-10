@@ -5,6 +5,8 @@ namespace Sminnee\SilverStripeIntercom;
 use LogicException;
 use Intercom\IntercomBasicAuthClient;
 use Member;
+use Config;
+use Injector;
 
 /**
  * Entry point for interaction with with Intercom.
@@ -66,7 +68,7 @@ class Intercom
 	 * @return DataList
 	 */
 	public function getUserList() {
-		if($userList = \Config::inst()->get('Intercom', 'user_list')) {
+		if($userList = Config::inst()->get('Sminnee\SilverStripeIntercom\Intercom', 'user_list')) {
 			if(substr($userList,0,2) != '%$') {
 				throw new \InvalidArgumentException("Please set user_list to a string of the form %\$ServiceName");
 			}

@@ -1,92 +1,95 @@
 <?php
 
-namespace Sminnee\SilverStripeIntercom\Tests;
+namespace SilverStripe\Addon\Intercom\Tests;
 
-use Sminnee\SilverStripeIntercom\RequestFilter;
-
+use DataModel;
+use DBField;
 use SapphireTest;
+use Session;
+use SilverStripe\Addon\Intercom\ScriptTagsRequestFilter;
 use SS_HTTPRequest;
 use SS_HTTPResponse;
-use DataModel;
-use Session;
-use DBField;
 
-class RequestFilterTest extends SapphireTest {
+class RequestFilterTest extends SapphireTest
+{
+    /**
+     * @dataProvider sampleResponses
+     *
+     * @param SS_HTTPResponse $response
+     * @param bool $shouldMatch
+     */
+    public function testScriptInsertion($response, $shouldMatch)
+    {
+        $tag = DBField::create_field("HTMLText", "<script>test;</script>");
 
-	/**
-	 * @dataProvider sampleResponses
-	 */
-	function testScriptInsertion($response, $match) {
+        if ($shouldMatch) {
+            $this->assertRegExp(
+                "#<script>test;</script></body>#is",
+                $this->checkFilterForResponse($response, $tag)->getBody()
+            );
+        } else {
+            $this->assertNotRegExp(
+                "#<script>test;</script></body>#is",
+                $this->checkFilterForResponse($response, $tag)->getBody()
+            );
+        }
+    }
 
-		// Simulating an enabled script tag
-		$tag = DBField::create_field('HTMLText', '<script>test;</script>');
+    /**
+     * @return array
+     */
+    public function sampleResponses()
+    {
+        $test = [];
 
-		// Check that script has been added before the body
-		if($match) {
-			$this->assertRegExp(
-				'/<script>test;<\/script><\/body>/is',
-				$this->checkFilterForResponse($response, $tag)->getBody()
-			);
-		} else {
-			$this->assertNotRegExp(
-				'/<script>test;<\/script><\/body>/is',
-				$this->checkFilterForResponse($response, $tag)->getBody()
-			);
-		}
-	}
+        $test[] = [
+            new SS_HTTPResponse("<html><head></head><body><p>regular response has script added</p></body></html>"), true
+        ];
 
-	function sampleResponses() {
-		$test = array();
+        $test[] = [
+            new SS_HTTPResponse("<p>fragment doesn't have script added</p>"), false
+        ];
 
-		// Regular responses
-		$test[] = array(new SS_HTTPResponse("<html><head></head><body><p>regular response has script added</p></body></html>"), 1);
+        $response = new SS_HTTPResponse("<html><head></head><body><p>regular response has script added</p></body></html>");
+        $response->addHeader("Content-Type", "text/plain");
 
-		// Fragment response without a </body> doesn't have code added
-		$test[] = array(new SS_HTTPResponse("<p>fragment doesn't have script added</p>"), 0);
+        $test[] = [
+            $response, 0
+        ];
 
-		// Plaintext response doesn't have code added
-		$response = new SS_HTTPResponse("<html><head></head><body><p>regular response has script added</p></body></html>");
-		$response->addHeader("Content-Type", "text/plain");
-		$test[] = array($response, 0);
+        return $test;
+    }
 
-		return $test;
-	}
+    public function testScriptTagsDisabling()
+    {
+        $response = new SS_HTTPResponse("<html><head></head><body><p>regular response has script added</p></body></html>");
 
-	/**
-	 * Test that no script is addded if IntercomScriptTags is disabled
-	 */
-	function testScriptTagsDisabling() {
-		$response = new SS_HTTPResponse("<html><head></head><body><p>regular response has script added</p></body></html>");
+        $tag = DBField::create_field("HTMLText", "");
 
-		// Empty response, simulating a disabled script tag
-		$tag = DBField::create_field('HTMLText', '');
+        $this->assertRegExp(
+            "#</p></body>#i",
+            $this->checkFilterForResponse($response, $tag)->getBody()
+        );
+    }
 
-		// Check that script has been added before the body
-		$this->assertRegExp(
-			'/<\/p><\/body>/i',
-			$this->checkFilterForResponse($response, $tag)->getBody()
-		);
-	}
+    /**
+     * @param SS_HTTPResponse $response
+     * @param DBField $tag
+     *
+     * @return SS_HTTPResponse
+     */
+    public function checkFilterForResponse(SS_HTTPResponse $response, DBField $tag)
+    {
+        $request = new SS_HTTPRequest("GET", "/");
+        $model = new DataModel();
+        $session = new Session([]);
 
-	/**
-	 * Set up test scaffold to check the RequestFilter's effect on a response
-	 */
-	function checkFilterForResponse($response, $tag) {
-		// Test stub
-		$request = new SS_HTTPRequest("GET", "/");
-		$model = new DataModel();
-		$session = new Session(array());
+        $filter = new ScriptTagsRequestFilter();
+        $filter->setTagProvider($tag);
 
-		// Execute the filter
-		$filter = new RequestFilter();
-		$filter->setTagProvider($tag);
+        $filter->preRequest($request, $session, $model);
+        $filter->postRequest($request, $response, $model);
 
-		$filter->preRequest($request, $session, $model);
-		$filter->postRequest($request, $response, $model);
-
-		return $response;
-	}
-
-
-
+        return $response;
+    }
 }

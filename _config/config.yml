@@ -2,12 +2,12 @@ Injector:
   RequestProcessor:
     properties:
       filters:
-        - '%$Sminnee\SilverStripeIntercom\RequestFilter'
-  Sminnee\SilverStripeIntercom\RequestFilter:
+        - "%$SilverStripe\Addon\Intercom\ScriptTagsRequestFilter"
+  SilverStripe\Addon\Intercom\ScriptTagsRequestFilter:
     properties:
-      TagProvider: %$Sminnee\SilverStripeIntercom\IntercomScriptTags
+      TagProvider: %$SilverStripe\Addon\Intercom\ScriptTags
 
 Intercom:
-  user_fields: ['type', 'user_id', 'email', 'id', 'signed_up_at',  'created_at','name', 'last_seen_ip', 'custom_attributes', 'last_seen_user_agent', 'last_request_at', 'unsubscribed_from_emails', 'update_last_request_at', 'new_session', 'company']
-  lead_fields: ['type', 'user_id', 'email', 'id', 'updated_at',  'created_at', 'name', 'last_seen_ip', 'custom_attributes', 'last_seen_user_agent', 'last_request_at', 'unsubscribed_from_emails', 'update_last_request_at', 'social_profiles', 'companies', 'segments', 'tags']
-  company_fields: ['type', 'id', 'created_at', 'remote_created_at', 'updated_at', 'company_id', 'name', 'custom_attributes', 'session_count', 'monthly_spend', 'user_count', 'plan']
+  user_fields: ["type", "user_id", "email", "id", "signed_up_at",  "created_at","name", "last_seen_ip", "custom_attributes", "last_seen_user_agent", "last_request_at", "unsubscribed_from_emails", "update_last_request_at", "new_session", "company"]
+  lead_fields: ["type", "user_id", "email", "id", "updated_at",  "created_at", "name", "last_seen_ip", "custom_attributes", "last_seen_user_agent", "last_request_at", "unsubscribed_from_emails", "update_last_request_at", "social_profiles", "companies", "segments", "tags"]
+  company_fields: ["type", "id", "created_at", "remote_created_at", "updated_at", "company_id", "name", "custom_attributes", "session_count", "monthly_spend", "user_count", "plan"]

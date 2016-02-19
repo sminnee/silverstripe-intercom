@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\Addon\Intercom;
+namespace SilverStripe\Intercom;
 
 use DataExtension;
 use Exception;
@@ -196,7 +196,7 @@ class FormExtension extends DataExtension
             throw new LogicException("You must define mapped fields to send a form submission to intercom, using Form::setIntercomFieldMapping() or Form::setIntercomNoteMapping()");
         }
 
-        $intercom = Injector::inst()->get("SilverStripe\\Addon\\Intercom\\Client");
+        $intercom = Injector::inst()->get("SilverStripe\\Intercom\\Client");
         $leadData = [];
 
         foreach ($this->intercomUserFieldMapping as $formField => $intercomField) {

@@ -1,6 +1,6 @@
 # SilverStripe Intercom Module
 
-[![Build Status](https://travis-ci.org/silverstripe/silverstripe-addon-intercom.svg?branch=master)](https://travis-ci.org/silverstripe/silverstripe-addon-intercom)
+[![Build Status](https://travis-ci.org/silverstripe/silverstripe-intercom.svg?branch=master)](https://travis-ci.org/silverstripe/silverstripe-intercom)
 
 This module provides SilverStripe integration for [Intercom](https://www.intercom.io).
 
@@ -44,7 +44,7 @@ you should use on your test and development environments.
 Your application can customise the information send with the following properties
 
 ```yml
-SilverStripe\Addon\Intercom\ScriptTags:
+SilverStripe\Intercom\ScriptTags:
   anonymous_access: true
   company_property: Organisation
   company_fields:
@@ -62,7 +62,7 @@ SilverStripe\Addon\Intercom\ScriptTags:
 
 ### Only show Intercom sometimes
 
-The `SilverStripe\Addon\Intercom\ScriptTags` class has a configuration value, `enabled`, that can will
+The `SilverStripe\Intercom\ScriptTags` class has a configuration value, `enabled`, that can will
 disable any inclusion of Intercom script tags if set to false.
 
 If you wish to show Intercom only sometimes, you can update this configuration value at any time during
@@ -70,7 +70,7 @@ your page load, with the following command. For example, you may choose to show 
 pages, or for certain users.
 
 ```php
-SilverStripe\Addon\Intercom\ScriptTags::config()->enabled = false;
+SilverStripe\Intercom\ScriptTags::config()->enabled = false;
 ```
 
 ## Usage
@@ -81,7 +81,7 @@ You can track events with the `Intercom::trackEvent()` method. The event will be
 current user.
 
 ```php
-$client = Injector::inst()->get("SilverStripe\Addon\Intercom\Client");
+$client = Injector::inst()->get("SilverStripe\Intercom\Client");
 
 $client->trackEvent("test-event", [
     "something" => "a value",
@@ -113,7 +113,7 @@ synchronise all Member objects. If you wish to synchronise a reduced list of Mem
 ServiceName is the name of an Injector service.
 
 ```yml
-SilverStripe\Addon\Intercom\Client:
+SilverStripe\Intercom\Client:
   user_list: %$AllPlatformUsers
 Injector:
   AllPlatformUsers:
@@ -135,12 +135,12 @@ class AllUserListFactory
 
 ### Integration with forms
 
-To send data to Intercom from a form, you can use `SilverStripe\Addon\Intercom\FormExtension`.
+To send data to Intercom from a form, you can use `SilverStripe\Intercom\FormExtension`.
 
 ```yml
 Form:
   extensions:
-    - "SilverStripe\Addon\Intercom\FormExtension"
+    - "SilverStripe\Intercom\FormExtension"
 ```
 
 This will provide several chainable methods to the `Form` class that help you map form fields to
@@ -196,7 +196,7 @@ See the [silverstripe-intercom-userforms](https://github.com/unclecheese/silvers
  
 ## Bugtracker
 
-Bugs are tracked in the [issues section](https://github.com/sminnee/silverstripe-intercom/issues) of this
+Bugs are tracked in the [issues section](https://github.com/silverstripe/silverstripe-intercom/issues) of this
 repository. Before submitting an issue please read over existing issues to ensure yours is unique.
  
 If the issue does look like a new bug:

@@ -6,7 +6,7 @@ use DataModel;
 use DBField;
 use SapphireTest;
 use Session;
-use SilverStripe\Addon\Intercom\ScriptTagsRequestFilter;
+use SilverStripe\Intercom\ScriptTagsRequestFilter;
 use SS_HTTPRequest;
 use SS_HTTPResponse;
 

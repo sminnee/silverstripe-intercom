@@ -2,10 +2,10 @@ Injector:
   RequestProcessor:
     properties:
       filters:
-        - "%$SilverStripe\Addon\Intercom\ScriptTagsRequestFilter"
-  SilverStripe\Addon\Intercom\ScriptTagsRequestFilter:
+        - "%$SilverStripe\Intercom\ScriptTagsRequestFilter"
+  SilverStripe\Intercom\ScriptTagsRequestFilter:
     properties:
-      TagProvider: %$SilverStripe\Addon\Intercom\ScriptTags
+      TagProvider: %$SilverStripe\Intercom\ScriptTags
 
 Intercom:
   user_fields: ["type", "user_id", "email", "id", "signed_up_at",  "created_at","name", "last_seen_ip", "custom_attributes", "last_seen_user_agent", "last_request_at", "unsubscribed_from_emails", "update_last_request_at", "new_session", "company"]

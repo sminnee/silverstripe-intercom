@@ -7,17 +7,17 @@ use Member;
 use Permission;
 use PermissionProvider;
 
-class Team extends DataObject implements PermissionProvider
+class Tag extends DataObject implements PermissionProvider
 {
     /**
      * @var string
      */
-    private static $singular_name = "Team";
+    private static $singular_name = "Tag";
 
     /**
      * @var string
      */
-    private static $plural_name = "Teams";
+    private static $plural_name = "Tags";
 
     /**
      * @var array
@@ -25,7 +25,6 @@ class Team extends DataObject implements PermissionProvider
     private static $db = array(
         "Type" => "Varchar(32)",
         "Name" => "Varchar(255)",
-        "Email" => "Varchar(255)",
         "IntercomID" => "Int",
     );
 
@@ -62,7 +61,7 @@ class Team extends DataObject implements PermissionProvider
      */
     public function canView($member = null)
     {
-        return Permission::check("VIEW_INTERCOM_TEAMS");
+        return Permission::check("VIEW_INTERCOM_TAGS");
     }
 
     /**
@@ -73,7 +72,7 @@ class Team extends DataObject implements PermissionProvider
     public function providePermissions()
     {
         return [
-            "VIEW_INTERCOM_TEAMS" => "View Intercom teams",
+            "VIEW_INTERCOM_TAGS" => "View Intercom tags",
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\Addon\Intercom;
+namespace SilverStripe\Intercom\Task;
 
 use BuildTask;
 use Debug;
@@ -8,14 +8,14 @@ use Director;
 use Injector;
 use SS_HTTPRequest;
 
-class BulkLoadTask extends BuildTask
+class BulkLoadUsers extends BuildTask
 {
     /**
      * @param SS_HTTPRequest $request
      */
     public function run($request)
     {
-        $intercom = Injector::inst()->get('SilverStripe\Addon\Intercom\Client');
+        $intercom = Injector::inst()->get("SilverStripe\\Intercom\\Client");
 
         if ($jobID = $request->getVar("JobID")) {
             $job = $intercom->getBulkJob($request->getVar("JobID"));
@@ -34,12 +34,12 @@ class BulkLoadTask extends BuildTask
 
         if (Director::is_cli()) {
             $this->line("Job id " . $jobID);
-            $this->line("To see status, run: sake dev/tasks/IntercomBulkLoadTask JobID=" . $jobID);
+            $this->line("To see status, run: sake dev/tasks/SilverStripe-Intercom-Task-BulkLoadUsers JobID=" . $jobID);
 
             return;
         }
 
-        $url = Director::absoluteURL("dev/tasks/IntercomBulkLoadTask?JobID=" . urlencode($jobID));
+        $url = Director::absoluteURL("dev/tasks/SilverStripe-Intercom-Task-BulkLoadUsers?JobID=" . urlencode($jobID));
 
         $this->line("<p>Job id " . $jobID . "</p>");
         $this->line("<p><a href='" . $url . "'>Click here to see job status</a></p>");
@@ -51,5 +51,6 @@ class BulkLoadTask extends BuildTask
     private function line($message)
     {
         print $message . "\n";
+        flush();
     }
 }

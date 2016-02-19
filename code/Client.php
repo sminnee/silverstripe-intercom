@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\Addon\Intercom;
+namespace SilverStripe\Intercom;
 
 use Config;
 use DataList;

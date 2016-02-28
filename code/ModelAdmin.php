@@ -17,7 +17,6 @@ class ModelAdmin extends BaseModelAdmin
     private static $managed_models = array(
         "SilverStripe\\Intercom\\Model\\Tag",
         "SilverStripe\\Intercom\\Model\\Team",
-        "SilverStripe\\Intercom\\Model\\Route",
     );
 
     /**

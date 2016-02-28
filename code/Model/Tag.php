@@ -29,13 +29,6 @@ class Tag extends DataObject implements PermissionProvider
     ];
 
     /**
-     * @var array
-     */
-    private static $belongs_many_many = [
-        "Routes" => "Route.Tags",
-    ];
-
-    /**
      * @inheritdoc
      *
      * @param null|Member $member

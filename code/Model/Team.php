@@ -30,13 +30,6 @@ class Team extends DataObject implements PermissionProvider
     ];
 
     /**
-     * @var array
-     */
-    private static $belongs_many_many = [
-        "Routes" => "Route.Teams",
-    ];
-
-    /**
      * @inheritdoc
      *
      * @param null|Member $member

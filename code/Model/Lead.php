@@ -4,33 +4,30 @@ namespace SilverStripe\Intercom\Model;
 
 use DataObject;
 
-/**
- * @property int IntercomID
- * @property int LeadID
- */
-class Conversation extends DataObject
+class Lead extends DataObject
 {
     /**
      * @var string
      */
-    private static $singular_name = "Conversation";
+    private static $singular_name = "Lead";
 
     /**
      * @var string
      */
-    private static $plural_name = "Conversations";
+    private static $plural_name = "Leads";
 
     /**
      * @var array
      */
     private static $db = [
         "IntercomID" => "Varchar(32)",
+        "IsAssigned" => "Boolean(0)",
     ];
 
     /**
      * @var array
      */
-    private static $has_one = [
-        "Lead" => "Lead",
+    private static $has_many = [
+        "Conversations" => "Conversation",
     ];
 }

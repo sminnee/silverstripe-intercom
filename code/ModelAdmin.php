@@ -1,11 +1,18 @@
 <?php
 
-namespace SilverStripe\Intercom\Admin;
+namespace SilverStripe\Intercom;
 
 use ModelAdmin as BaseModelAdmin;
 
 class ModelAdmin extends BaseModelAdmin
 {
+    /**
+     * Whether or not to hide this admin menu item.
+     *
+     * @var bool
+     */
+    private static $hidden = true;
+
     /**
      * @var string
      */

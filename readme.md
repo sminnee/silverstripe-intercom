@@ -8,13 +8,9 @@ This module provides SilverStripe integration for [Intercom](https://www.interco
 
 - SilverStripe Framework 3.1 or higher (4.0 untested). Works nicely with the CMS but it isn't required.
 
-## Installation
+## Documentation
 
-Install the module with composer, just like all your favourite modules!
-
-```sh
-composer require silverstripe/intercom
-```
+You can find detailed documentation in the [docs folder](docs/index.md).
 
 ## License
 

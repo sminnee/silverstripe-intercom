@@ -10,6 +10,8 @@ class ModelAdmin extends BaseModelAdmin
      * Whether or not to hide this admin menu item.
      *
      * @var bool
+     *
+     * @config
      */
     private static $hidden = true;
 

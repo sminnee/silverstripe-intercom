@@ -9,13 +9,22 @@ use SilverStripe\Intercom\Task\UpdateTeams as UpdateTeamsTask;
 class UpdateTeams implements CronTask
 {
     /**
+     * How often to run this task.
+     *
+     * @var string
+     *
+     * @config
+     */
+    private static $schedule = "*/1 * * * *";
+
+    /**
      * @inheritdoc
      *
      * @return string
      */
     public function getSchedule()
     {
-        return "*/1 * * * *";
+        return $this->config()->schedule;
     }
 
     /**
@@ -23,7 +32,9 @@ class UpdateTeams implements CronTask
      */
     public function process()
     {
-        $task = new UpdateTeamsTask();
-        $task->run(new SS_HTTPRequest("GET", "/"));
+        if ($this->config()->schedule) {
+            $task = new UpdateTeamsTask();
+            $task->run(new SS_HTTPRequest("GET", "/"));
+        }
     }
 }

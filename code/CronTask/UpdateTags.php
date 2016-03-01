@@ -9,13 +9,22 @@ use SilverStripe\Intercom\Task\UpdateTags as UpdateTagsTask;
 class UpdateTags implements CronTask
 {
     /**
+     * How often to run this task.
+     *
+     * @var string
+     *
+     * @config
+     */
+    private static $schedule = "*/1 * * * *";
+
+    /**
      * @inheritdoc
      *
      * @return string
      */
     public function getSchedule()
     {
-        return "*/1 * * * *";
+        return $this->config()->schedule;
     }
 
     /**
@@ -23,7 +32,9 @@ class UpdateTags implements CronTask
      */
     public function process()
     {
-        $task = new UpdateTagsTask();
-        $task->run(new SS_HTTPRequest("GET", "/"));
+        if ($this->config()->schedule) {
+            $task = new UpdateTagsTask();
+            $task->run(new SS_HTTPRequest("GET", "/"));
+        }
     }
 }

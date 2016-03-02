@@ -101,14 +101,6 @@ class ConnectLeadsAndConversations extends BuildTask
                 $client->getClient()->replyToConversation([
                     "id" => $existingConversation->IntercomID,
                     "type" => "admin",
-                    "message_type" => "assignment",
-                    "admin_id" => $this->config()->assignment_admin_id,
-                    "assignee_id" => $connector->getTeamIdentifier(),
-                ]);
-
-                $client->getClient()->replyToConversation([
-                    "id" => $existingConversation->IntercomID,
-                    "type" => "admin",
                     "message_type" => "note",
                     "body" => join("\n\n", array_map(function($note) {
                         return $note["body"];
@@ -116,13 +108,29 @@ class ConnectLeadsAndConversations extends BuildTask
                     "admin_id" => $this->config()->assignment_admin_id,
                 ]);
 
-                foreach ($connector->getTags() as $tag) {
-                    $client->getClient()->tagUsers([
-                        "name" => $tag,
-                        "users" => [
-                            ["id" => $contact["id"]],
-                        ],
+                $teamIdentifier = $connector->getTeamIdentifier($contact, $notes);
+
+                if ($teamIdentifier) {
+                    $client->getClient()->replyToConversation([
+                        "id" => $existingConversation->IntercomID,
+                        "type" => "admin",
+                        "message_type" => "assignment",
+                        "admin_id" => $this->config()->assignment_admin_id,
+                        "assignee_id" => $teamIdentifier,
                     ]);
+                }
+
+                $tags = $connector->getTags($contact, $notes);
+
+                if (!empty($tags)) {
+                    foreach ($tags as $tag) {
+                        $client->getClient()->tagUsers([
+                            "name" => $tag,
+                            "users" => [
+                                ["id" => $contact["id"]],
+                            ],
+                        ]);
+                    }
                 }
 
                 $existingLead->IsAssigned = true;

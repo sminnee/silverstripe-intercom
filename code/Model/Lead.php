@@ -4,6 +4,11 @@ namespace SilverStripe\Intercom\Model;
 
 use DataObject;
 
+/**
+ * @property int $IntercomID
+ * @property bool $IsAssigned
+ * @method Conversation[] Conversations()
+ */
 class Lead extends DataObject
 {
     /**

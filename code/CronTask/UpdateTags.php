@@ -15,7 +15,7 @@ class UpdateTags implements CronTask
      *
      * @config
      */
-    private static $schedule = "*/1 * * * *";
+    private static $schedule = "*/30 * * * *";
 
     /**
      * @inheritdoc

@@ -7,16 +7,22 @@ interface LeadAndConversationConnector
     /**
      * Array of Intercom tags for this connector.
      *
+     * @param array $lead
+     * @param array $notes
+     *
      * @return array
      */
-    public function getTags();
+    public function getTags(array $lead, array $notes);
 
     /**
      * IntercomID value for the team assigned for this connector.
      *
+     * @param array $lead
+     * @param array $notes
+     *
      * @return string
      */
-    public function getTeamIdentifier();
+    public function getTeamIdentifier(array $lead, array $notes);
 
     /**
      * Whether this lead and conversation should be connected to the specified tags and teams.

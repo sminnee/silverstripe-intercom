@@ -4,8 +4,8 @@ The module has a few automated tasks, which require the `silverstripe/cron-task`
 
 Once it is correctly installed and configured, this module will run the automated tasks at the following times:
 
-- Updating Intercom tags → every minute
-- Updating Intercom teams → every minute
+- Updating Intercom tags → every 30 minutes
+- Updating Intercom teams → every 30 minutes
 - Creating, tagging and assigning Intercom conversations to teams → every hour
 
 You can change these frequencies with the following config settings:

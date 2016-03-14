@@ -2,6 +2,7 @@
 
 namespace SilverStripe\Intercom\CronTask;
 
+use Config;
 use CronTask;
 use SS_HTTPRequest;
 use SilverStripe\Intercom\Task\UpdateTags as UpdateTagsTask;
@@ -24,7 +25,7 @@ class UpdateTags implements CronTask
      */
     public function getSchedule()
     {
-        return $this->config()->schedule;
+        return Config::inst()->get(static::class, "schedule");
     }
 
     /**
@@ -32,7 +33,7 @@ class UpdateTags implements CronTask
      */
     public function process()
     {
-        if ($this->config()->schedule) {
+        if ($this->getSchedule()) {
             $task = new UpdateTagsTask();
             $task->run(new SS_HTTPRequest("GET", "/"));
         }

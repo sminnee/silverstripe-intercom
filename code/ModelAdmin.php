@@ -2,7 +2,11 @@
 
 namespace SilverStripe\Intercom;
 
-use ModelAdmin as BaseModelAdmin;
+use SilverStripe\Admin\ModelAdmin as BaseModelAdmin;
+
+if (!class_exists(BaseModelAdmin::class)) {
+    return;
+}
 
 class ModelAdmin extends BaseModelAdmin
 {
@@ -14,11 +18,6 @@ class ModelAdmin extends BaseModelAdmin
      * @config
      */
     private static $hidden = true;
-
-    /**
-     * @var string
-     */
-    private static $menu_icon = "silverstripe-intercom/img/menu-icon.png";
 
     /**
      * @var array

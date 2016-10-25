@@ -2,11 +2,11 @@
 
 namespace SilverStripe\Intercom\Task;
 
-use BuildTask;
+use SilverStripe\Dev\BuildTask;
 use Guzzle\Service\Resource\Model;
-use Injector;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Intercom\Model\Tag;
-use SS_HTTPRequest;
+use SilverStripe\Control\HTTPRequest;
 
 class UpdateTags extends BuildTask
 {

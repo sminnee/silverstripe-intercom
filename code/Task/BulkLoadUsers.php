@@ -2,11 +2,11 @@
 
 namespace SilverStripe\Intercom\Task;
 
-use BuildTask;
-use Debug;
-use Director;
-use Injector;
-use SS_HTTPRequest;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Dev\Debug;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Control\HTTPRequest;
 
 class BulkLoadUsers extends BuildTask
 {

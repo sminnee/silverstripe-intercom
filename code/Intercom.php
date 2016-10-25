@@ -4,6 +4,7 @@ namespace Sminnee\SilverStripeIntercom;
 
 use LogicException;
 use Intercom\IntercomBasicAuthClient;
+use SS_List;
 use Member;
 use Config;
 use Injector;
@@ -87,7 +88,7 @@ class Intercom
 	public function bulkLoadUsers(SS_List $members) {
 		$userFields = Config::inst()->get('Intercom','user_fields');
 		$companyFields = Config::inst()->get('Intercom','company_fields');
-		
+
 		$scriptTags = new IntercomScriptTags();
 
 		// Build the batch API submission

@@ -207,10 +207,10 @@ class IntercomFormExtension extends DataExtension {
 				$noteData .= '</ul>';
 
 				try {
-					$intercom->getClient()->createNote([
+					$intercom->getClient()->notes->create([
 						'body' => $noteData,
 						'user' => ['id' => $lead['id']]
-					]);	
+					]);
 				}
 				catch (Exception $e) {
 					SS_Log::log("Could not create note: {$e->getMessage()}", SS_Log::WARN);

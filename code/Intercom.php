@@ -3,7 +3,7 @@
 namespace Sminnee\SilverStripeIntercom;
 
 use LogicException;
-use Intercom\IntercomBasicAuthClient;
+use Intercom\IntercomClient;
 use SS_List;
 use Member;
 use Config;
@@ -15,28 +15,28 @@ use Injector;
 class Intercom
 {
 
-	private $apiKey;
+	private $personalAccessToken;
 	private $appId;
 	private $client;
 
 	function __construct() {
-		if(defined('INTERCOM_API_KEY')) {
-			$this->apiKey = INTERCOM_API_KEY;
+		if(defined('INTERCOM_PERSONAL_ACCESS_TOKEN')) {
+			$this->personalAccessToken = INTERCOM_PERSONAL_ACCESS_TOKEN;
 		}
 		if(defined('INTERCOM_APP_ID')) {
 			$this->appId = INTERCOM_APP_ID;
 		}
 	}
 
-	function getApiKey() {
-		if(!$this->apiKey) {
-			throw new LogicException("Intercom API key not set! Define INTERCOM_API_KEY or use Injector to set ApiKey");
+	function getPersonalAccessToken() {
+		if(!$this->personalAccessToken) {
+			throw new LogicException("Intercom Personal Access Token not set! Define INTERCOM_PERSONAL_ACCESS_TOKEN or use Injector to set Personal Access Token");
 		}
-		return $this->apiKey;
+		return $this->personalAccessToken;
 	}
 
-	function setApiKey($apiKey) {
-		$this->apiKey = $apiKey;
+	function setPersonalAccessToken($token) {
+		$this->personalAccessToken = $token;
 	}
 
 	function getAppId() {
@@ -45,18 +45,13 @@ class Intercom
 		}
 		return $this->appId;
 	}
-
 	function setAppId($appId) {
 		$this->appId = $appId;
 	}
 
-
 	public function getClient() {
 		if(!$this->client) {
-			$this->client = IntercomBasicAuthClient::factory(array(
-			    'app_id' => $this->getAppId(),
-			    'api_key' => $this->getApiKey()
-			));
+			$this->client = new IntercomClient($this->getPersonalAccessToken(), null);
 		}
 		return $this->client;
 	}
@@ -121,9 +116,9 @@ class Intercom
 			];
 		}
 
-		$result = $this->getClient()->bulkUsers(['items' => $items]);
+		$result = $this->getClient()->bulk->users(['items' => $items]);
 
-		return $this->getBulkJob($result->get('id'));
+		return $this->getBulkJob($result->id);
 	}
 
 
@@ -162,6 +157,6 @@ class Intercom
 			$payload['metadata'] = $eventData;
 		}
 
-		$this->getClient()->createEvent($payload);
+		$this->getClient()->events->create($payload);
 	}
 }

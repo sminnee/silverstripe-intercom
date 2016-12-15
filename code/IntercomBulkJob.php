@@ -2,10 +2,6 @@
 
 namespace Sminnee\SilverStripeIntercom;
 
-use LogicException;
-use Intercom\IntercomBasicAuthClient;
-use Member;
-
 /**
  * Reference to a bulk job result
  */
@@ -25,10 +21,10 @@ class IntercomBulkJob
 	}
 
 	function getInfo(){
-		return $this->client->getJob(['id' => $this->id]);
+		return $this->client->get('jobs/' . $this->id, null);
 	}
 
 	function getErrors(){
-		return $this->client->getJobErrors(['id' => $this->id]);
+		return $this->client->get('jobs/' . $this->id . '/error', null);
 	}
 }

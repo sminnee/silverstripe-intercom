@@ -4,13 +4,12 @@
 
 This module provides SilverStripe integration for [Intercom](https://www.intercom.io/).
 
-and help others make use of your modules.
-
 ## Requirements
  * SilverStripe Framework 3.1 or higher (4.0 untested). Works nicely with the CMS but it isn't required.
+ * PHP >=5.6.0
 
 ## Installation
-Install the module with composer, just like all your favourite module!
+Install the module with composer, just like all your favourite modules!
 
 ```
 composer require sminnee/silverstripe-intercom
@@ -29,14 +28,14 @@ The module will make use of the following global constants in your `_ss_environm
 set these up
 
  * `INTERCOM_APP_ID`: The "App ID" from Intercom's integration settings. Required.
- * `INTERCOM_API_KEY`: The "API key" from Intercom's integration settings. Required.
+ * `INTERCOM_PERSONAL_ACCESS_TOKEN`: The "Personal Access Token" from Intercom's integration settings. Required.
  * `INTERCOM_SECRET_KEY`: The secret key given by Intercom's Secure Mode. Optional, but highly recommended.
 
 Note that if you disclose your secret key to anyone, they could impersonate users of your app and chat to 
 your support team, so keep it secure! The App ID is less sensitive as it is in the HTML source of your 
 site.
 
-I recommend that you provide enable the "Test Version" of Intercom. This will give you a second App ID that
+I recommend that you enable the "Test Version" of Intercom. This will give you a second App ID that
 you should use on your test and development environments.
 
 Your application can customise the information send with the following properties
@@ -104,7 +103,7 @@ Sometimes, it's not enough to wait until users log in to have their Intercom dat
 you want to use Intercom to send emails you may want to update the Intercom database before the first email
 is sent.
 
-For this purpose, you can set `dev/tasks/IntercomBulkLoadTask` to run no a cronjob. By default it will
+For this purpose, you can set `dev/tasks/IntercomBulkLoadTask` to run on a cronjob. By default it will
 synchronise all Member objects. If you wish to synchornise a reduced list of Members, you can set the
 `user_list` config option on the Intercom class. This should be of the form `%$ServiceName`, where ServiceName
 is the name of an Injector service.

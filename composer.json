@@ -4,8 +4,13 @@
     "type": "silverstripe-module",
     "require": {
         "php": ">=5.6.0",
-        "silverstripe/framework": "^3.1",
+        "silverstripe/framework": "^4.0@dev",
         "intercom/intercom-php": "^3.1"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
     },
     "license": "BSD-3-Clause",
     "authors": [

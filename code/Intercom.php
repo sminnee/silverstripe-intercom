@@ -113,6 +113,10 @@ class Intercom
 		return $this->client;
 	}
 
+	public function setClient($client) {
+		$this->client = $client;
+	}
+
 	/**
 	 * Return a list of all users for this application.
 	 * Define via the 'user_list' project, which should be '%$' followed by an Injector service anem.

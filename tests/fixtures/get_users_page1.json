@@ -1,0 +1,25 @@
+{
+  "type": "user.list",
+  "pages": {
+    "type": "pages",
+    "next": "https://api.intercom.io/users?page=2&per_page=2",
+    "page": 1,
+    "per_page": 2,
+    "total_pages": 2
+  },
+  "users": [
+    {
+      "type": "user",
+      "id": "1",
+      "email": "test-user-1",
+      "name": "Test User 1"
+    },
+    {
+      "type": "user",
+      "id": "2",
+      "email": "test-user-2",
+      "name": "Test User 2"
+    }
+  ],
+  "total_count": 4
+}

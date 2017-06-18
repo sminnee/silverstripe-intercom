@@ -65,7 +65,7 @@ class Intercom
 		if ($this->httpClient) {
 			return $this->httpClient;
 		}
-		$handlerStack = new HandlerStack::create(new CurlHandler());
+		$handlerStack = HandlerStack::create(new CurlHandler());
 		$handlerStack->push(Middleware::retry(
 			function ($retries, $request, $response, $exception) {
 				if ($retries > 5) {

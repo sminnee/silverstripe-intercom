@@ -2,6 +2,11 @@
 
 namespace Sminnee\SilverStripeIntercom;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Handler\CurlHandler;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Exception\ConnectException;
 use LogicException;
 use Intercom\IntercomClient;
 use SS_List;
@@ -17,6 +22,7 @@ class Intercom
 
 	private $personalAccessToken;
 	private $appId;
+	private $httpClient;
 	private $client;
 
 	function __construct() {
@@ -49,13 +55,63 @@ class Intercom
 		$this->appId = $appId;
 	}
 
-	public function getClient() {
-		if(!$this->client) {
-			$this->client = new IntercomClient($this->getPersonalAccessToken(), null);
+	/**
+	 * Return an HTTP client used by IntercomClient.
+	 * By default, we provide one that has some retry/back-off support.
+	 *
+	 * @return Client
+	 */
+	public function getHttpClient() {
+		if ($this->httpClient) {
+			return $this->httpClient;
 		}
-		return $this->client;
+		$handlerStack = new HandlerStack::create(new CurlHandler());
+		$handlerStack->push(Middleware::retry(
+			function ($retries, $request, $response, $exception) {
+				if ($retries > 5) {
+					return false;
+				}
+				if ($exception instanceof ConnectException) {
+					return true;
+				}
+				if ($response && ($response->getStatusCode() >= 500 || $response->getStatusCode() == 429)) {
+					// 500s and 429 or greater we should keep retrying. 429 is one example "Too Many Requests"
+					// which is the point we have exceeded our rate limit.
+					return true;
+				}
+				return false;
+			},
+			function ($retries) {
+				return 2000 * $retries; // keep increasing the delay each retry
+			}
+		));
+		$client = new Client([
+			'handler' => $handlerStack,
+			'timeout' => 10.0
+		]);
+		$this->httpClient = $client;
+		return $this->httpClient;
 	}
 
+	/**
+	 * @param $client Client
+	 */
+	public function setHttpClient($client) {
+		$this->httpClient = $client;
+	}
+
+	/**
+	 * @return IntercomClient
+	 */
+	public function getClient() {
+		if ($this->client) {
+			return $this->client;
+		}
+		$client = new IntercomClient($this->getPersonalAccessToken(), null);
+		$client->setClient($this->getHttpClient());
+		$this->client = $client;
+		return $this->client;
+	}
 
 	/**
 	 * Return a list of all users for this application.
@@ -120,7 +176,6 @@ class Intercom
 
 		return $this->getBulkJob($result->id);
 	}
-
 
 	/**
 	 * Return an IntercomBulkJob object for the given job

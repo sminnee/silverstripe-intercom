@@ -1,0 +1,24 @@
+{
+	"type": "user.list",
+	"pages": {
+		"type": "pages",
+		"page": 2,
+		"per_page": 2,
+		"total_pages": 2
+	},
+	"users": [
+		{
+			"type": "user",
+			"id": "3",
+			"email": "test-user-3",
+			"name": "Test User 3"
+		},
+		{
+			"type": "user",
+			"id": "4",
+			"email": "test-user-4",
+			"name": "Test User 4"
+		}
+	],
+	"total_count": 4
+}

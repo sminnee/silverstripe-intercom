@@ -1,6 +1,6 @@
 # SilverStripe Intercom Module
 
-[![Build Status](https://travis-ci.org/sminnee/silverstripe-intercom.svg?branch=master)](https://travis-ci.org/sminnee/silverstripe-intercom)
+[![Build Status](https://travis-ci.org/silverstripe/silverstripe-intercom.svg?branch=master)](https://travis-ci.org/silverstripe/silverstripe-intercom)
 
 This module provides SilverStripe integration for [Intercom](https://www.intercom.io/).
 

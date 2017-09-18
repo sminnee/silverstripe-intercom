@@ -3,10 +3,13 @@
 namespace Sminnee\SilverStripeIntercom;
 
 use SS_Log;
-use DataExtension;
+
 use LogicException;
-use Injector;
+
 use Exception;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\DataExtension;
+
 
 /**
  * Adds functionality to forms to integrate with Intercom

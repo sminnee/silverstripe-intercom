@@ -1,5 +1,11 @@
 <?php
 
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Dev\Debug;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Control\Director;
+use SilverStripe\Dev\BuildTask;
+
 /**
  * Build task to bulk-load all relevant users into Intercom via the API
  */
@@ -17,7 +23,7 @@ class IntercomBulkLoadTask extends BuildTask
 			$members = $intercom->getUserList();
 			// Intercom has a hard limit of 100 on bulk jobs
 			foreach($this->chunkDataList($members, 100) as $memberchunk) {
-				echo "<li>" . implode("</li>\n<li>", $memberchunk->column('Email')), "</li>\n";
+				echo "<li>" . implode("</li>\n<li>", $memberchunk->column(Email::class)), "</li>\n";
 				$result = $intercom->bulkLoadUsers($memberchunk);
 				$jobID = $result->getID();
 

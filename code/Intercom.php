@@ -4,10 +4,10 @@ namespace Sminnee\SilverStripeIntercom;
 
 use LogicException;
 use Intercom\IntercomClient;
-use SS_List;
-use Member;
-use Config;
-use Injector;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Security\Member;
+use SilverStripe\ORM\SS_List;
 
 /**
  * Entry point for interaction with with Intercom.

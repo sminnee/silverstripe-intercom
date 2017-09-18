@@ -18,120 +18,122 @@ use SilverStripe\ORM\FieldType\DBField;
 class IntercomScriptTags implements SnippetProvider
 {
 
-	public function getTitle()
-	{
-		return "Intercom chat";
-	}
+    public function getTitle()
+    {
+        return "Intercom chat";
+    }
 
-	public function getSummary(array $params)
-	{
-		return "Intercom chat";
-	}
+    public function getSummary(array $params)
+    {
+        return "Intercom chat";
+    }
 
-	public function getParamFields()
-	{
-		if ($appID = getenv('INTERCOM_APP_ID')) {
-			$appIDField = new Forms\ReadonlyField('AppID', 'Intercom App ID', $appID);
+    public function getParamFields()
+    {
+        if ($appID = getenv('INTERCOM_APP_ID')) {
+            $appIDField = new Forms\ReadonlyField('AppID', 'Intercom App ID', $appID);
+        } else {
+            $appIDField = new Forms\TextField('AppID', 'Intercom App ID');
+        }
 
-		} else {
-			$appIDField = new Forms\TextField('AppID', 'Intercom App ID');
-		}
+        if (getenv('INTERCOM_SECRET_KEY')) {
+            $secretKeyField = new Forms\LiteralField('SecretKey', 'Intercom Secret Key', '(hidden)');
+        } else {
+            $secretKeyField = new Forms\TextField('SecretKey', 'Intercom Secret Key');
+        }
 
-		if (getenv('INTERCOM_SECRET_KEY')) {
-			$secretKeyField = new Forms\LiteralField('SecretKey', 'Intercom Secret Key', '(hidden)');
+        return new Forms\FieldList(
+            $appIDField,
+            $secretKeyField,
+            new Forms\CheckboxField('AnonymousAccess', 'Allow anonymous access?')
+        );
+    }
 
-		} else {
-			$secretKeyField = new Forms\TextField('SecretKey', 'Intercom Secret Key');
-		}
+    public function getSnippets(array $params)
+    {
+        $member = Security::getCurrentUser();
 
-		return new Forms\FieldList(
-			$appIDField,
-			$secretKeyField,
-			new Forms\CheckboxField('AnonymousAccess', 'Allow anonymous access?')
-		);
-	}
+        if (!$this->isEnabled($member, $params)) {
+            return [];
+        }
 
-	public function getSnippets(array $params) {
-		$member = Security::getCurrentUser();
+        $data = new ArrayData([
+            'IntercomSettingsJSON' => DBField::create_field(
+                'HTMLFragment',
+                json_encode($this->getIntercomSettings($member, $params))
+            )
+        ]);
 
-		if (!$this->isEnabled($member, $params)) {
-			return [];
-		}
+        return [
+            'end-body' => $data->renderWith('IntercomScriptTags'),
+        ];
+    }
 
-		$data = new ArrayData([
-			'IntercomSettingsJSON' => DBField::create_field(
-				'HTMLFragment',
-				json_encode($this->getIntercomSettings($member, $params))
-			)
-		]);
+    /**
+     * Return the Intercom settings an array.
+     * Extendable by adding extensions with updateIntercomSettings().
+     *
+     * @param Member $member - if not provided, it will try to Member::currentUser();
+     *
+     * @return array The settings, ready for JSON-encoding
+     */
+    public function getIntercomSettings(Member $member = null, $params = [])
+    {
+        if (!$this->isEnabled($member, $params)) {
+            return [];
+        }
 
-		return [
-			'end-body' => $data->renderWith('IntercomScriptTags'),
-		];
-	}
+        $settings = [
+            'app_id' => getenv('INTERCOM_APP_ID') ?: $params['AppID'],
+        ];
 
-	/**
-	 * Return the Intercom settings an array.
-	 * Extendable by adding extensions with updateIntercomSettings().
-	 *
-	 * @param Member $member - if not provided, it will try to Member::currentUser();
-	 *
-	 * @return array The settings, ready for JSON-encoding
-	 */
-	public function getIntercomSettings(Member $member = null, $params = []) {
-		if (!$this->isEnabled($member, $params)) {
-			return [];
-		}
+        if (!$member) {
+            $member = Member::currentUser();
+        }
 
-		$settings = [
-			'app_id' => getenv('INTERCOM_APP_ID') ?: $params['AppID'],
-		];
+        if ($member) {
+            $settings['name'] = trim($member->FirstName . ' ' . $member->Surname);
+            $settings['email'] = $member->Email;
+            $settings['created_at'] = trim($member->FirstName . ' ' . $member->Surname);
+            $settings['created_at'] = $member->obj('Created')->Format('U');
 
-		if (!$member) {
-			$member = Member::currentUser();
-		}
+            foreach ((array)Config::inst()->get('Intercom', 'user_fields') as $intercomKey => $propertyName) {
+                $settings[$intercomKey] = $member->$propertyName;
+            }
 
-		if ($member) {
-			$settings['name'] = trim($member->FirstName . ' ' . $member->Surname);
-			$settings['email'] = $member->Email;
-			$settings['created_at'] = trim($member->FirstName . ' ' . $member->Surname);
-			$settings['created_at'] = $member->obj('Created')->Format('U');
+            $secret = getenv('INTERCOM_SECRET_KEY') ?: $params['SecretKey'];
 
-			foreach((array)Config::inst()->get('Intercom', 'user_fields') as $intercomKey => $propertyName) {
-				$settings[$intercomKey] = $member->$propertyName;
-			}
+            if ($secret) {
+                $settings['user_hash'] = $this->generateUserHash($secret, $member->Email);
+            } else {
+                $settings['user_id'] = $member->ID;
+            }
 
-			$secret = getenv('INTERCOM_SECRET_KEY') ?: $params['SecretKey'];
+            if ($prop = Config::inst()->get('Intercom', 'company_property')) {
+                $org = $member->$prop;
+                if ($org) {
+                    $settings['company']['id'] = $org->ID;
+                    $settings['company']['created_at'] = $org->obj('Created')->Format('U');
 
-			if($secret) {
-				$settings['user_hash'] = $this->generateUserHash($secret, $member->Email);
-			} else {
-				$settings['user_id'] = $member->ID;
-			}
+                    $companyFields = (array)Config::inst()->get('Intercom', 'company_fields');
+                    foreach ($companyFields as $intercomKey => $propertyName) {
+                        $settings['company'][$intercomKey] = $org->$propertyName;
+                    }
+                }
+            }
+        };
 
-			if($prop = Config::inst()->get('Intercom', 'company_property')) {
-				$org = $member->$prop;
-				if($org) {
-					$settings['company']['id'] = $org->ID;
-					$settings['company']['created_at'] = $org->obj('Created')->Format('U');
+        return $settings;
+    }
 
-					foreach((array)Config::inst()->get('Intercom', 'company_fields') as $intercomKey => $propertyName) {
-						$settings['company'][$intercomKey] = $org->$propertyName;
-					}
-				}
-			}
-		};
-
-		return $settings;
-	}
-
-	protected function isEnabled(Member $member = null, array $params) {
-		return $member || !empty($params['AnonymousAccess']);
-	}
+    protected function isEnabled(Member $member = null, array $params = null)
+    {
+        return $member || !empty($params['AnonymousAccess']);
+    }
 
 
-	protected function generateUserHash($secret, $identifier) {
-		return hash_hmac("sha256", $identifier, $secret);
-	}
-
+    protected function generateUserHash($secret, $identifier)
+    {
+        return hash_hmac("sha256", $identifier, $secret);
+    }
 }

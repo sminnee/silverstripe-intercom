@@ -1,7 +1,7 @@
 {
     "name": "silverstripe/intercom",
     "description": "SilverStripe integration with Intercom.io",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "require": {
         "silverstripe/framework": "^4",
         "intercom/intercom-php": "^1.3"

@@ -1,0 +1,6 @@
+mappings:
+  Sminnee\SilverStripeIntercom\Intercom: SilverStripe\Intercom\Intercom
+  Sminnee\SilverStripeIntercom\IntercomBulkJob: SilverStripe\Intercom\IntercomBulkJob
+  IntercomBulkLoadTask: SilverStripe\Intercom\IntercomBulkLoadTask
+  Sminnee\SilverStripeIntercom\IntercomFormExtension: SilverStripe\Intercom\IntercomFormExtension
+  Sminnee\SilverStripeIntercom\IntercomScriptTags: SilverStripe\Intercom\IntercomScriptTags

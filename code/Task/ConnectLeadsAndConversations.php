@@ -2,12 +2,12 @@
 
 namespace SilverStripe\Intercom\Task;
 
-use BuildTask;
+use SilverStripe\Dev\BuildTask;
 use Guzzle\Service\Resource\Model;
-use Injector;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Intercom\Model\Conversation;
 use SilverStripe\Intercom\Model\Lead;
-use SS_HTTPRequest;
+use SilverStripe\Control\HTTPRequest;
 use stdClass;
 
 class ConnectLeadsAndConversations extends BuildTask
@@ -102,7 +102,7 @@ class ConnectLeadsAndConversations extends BuildTask
                     "id" => $existingConversation->IntercomID,
                     "type" => "admin",
                     "message_type" => "note",
-                    "body" => join("\n\n", array_map(function($note) {
+                    "body" => join("\n\n", array_map(function ($note) {
                         return $note["body"];
                     }, $notes)),
                     "admin_id" => $this->config()->assignment_admin_id,

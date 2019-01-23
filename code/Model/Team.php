@@ -2,10 +2,10 @@
 
 namespace SilverStripe\Intercom\Model;
 
-use DataObject;
-use Member;
-use Permission;
-use PermissionProvider;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionProvider;
 
 class Team extends DataObject implements PermissionProvider
 {
@@ -36,7 +36,7 @@ class Team extends DataObject implements PermissionProvider
      *
      * @return bool
      */
-    public function canCreate($member = null)
+    public function canCreate($member = null, $context = [])
     {
         return false;
     }

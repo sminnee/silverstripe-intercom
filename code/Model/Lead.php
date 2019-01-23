@@ -2,7 +2,7 @@
 
 namespace SilverStripe\Intercom\Model;
 
-use DataObject;
+use SilverStripe\ORM\DataObject;
 
 /**
  * @property int $IntercomID

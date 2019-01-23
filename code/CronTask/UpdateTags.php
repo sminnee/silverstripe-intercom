@@ -2,10 +2,14 @@
 
 namespace SilverStripe\Intercom\CronTask;
 
-use Config;
-use CronTask;
-use SS_HTTPRequest;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\CronTask\Interfaces\CronTask;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Intercom\Task\UpdateTags as UpdateTagsTask;
+
+if (!interface_exists(CronTask::class)) {
+    return;
+}
 
 class UpdateTags implements CronTask
 {

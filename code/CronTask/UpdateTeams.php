@@ -39,7 +39,7 @@ class UpdateTeams implements CronTask
     {
         if ($this->getSchedule()) {
             $task = new UpdateTeamsTask();
-            $task->run(new SS_HTTPRequest("GET", "/"));
+            $task->run(new HTTPRequest("GET", "/"));
         }
     }
 }

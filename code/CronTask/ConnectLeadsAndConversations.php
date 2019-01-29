@@ -39,7 +39,7 @@ class ConnectLeadsAndConversations implements CronTask
     {
         if ($this->getSchedule()) {
             $task = new ConnectLeadsAndConversationsTask();
-            $task->run(new SS_HTTPRequest("GET", "/"));
+            $task->run(new HTTPRequest("GET", "/"));
         }
     }
 }

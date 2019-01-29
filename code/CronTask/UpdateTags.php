@@ -39,7 +39,7 @@ class UpdateTags implements CronTask
     {
         if ($this->getSchedule()) {
             $task = new UpdateTagsTask();
-            $task->run(new SS_HTTPRequest("GET", "/"));
+            $task->run(new HTTPRequest("GET", "/"));
         }
     }
 }

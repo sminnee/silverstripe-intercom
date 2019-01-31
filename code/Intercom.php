@@ -24,7 +24,7 @@ class Intercom
     public function __construct()
     {
         if ($accessToken = self::getSetting('INTERCOM_PERSONAL_ACCESS_TOKEN')) {
-            $this->personalAccessToken = $appId;
+            $this->personalAccessToken = $accessToken;
         }
         if ($appId = self::getSetting('INTERCOM_APP_ID')) {
             $this->appId = $appId;

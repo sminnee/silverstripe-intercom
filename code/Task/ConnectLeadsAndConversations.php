@@ -5,6 +5,7 @@ namespace SilverStripe\Intercom\Task;
 use SilverStripe\Dev\BuildTask;
 use Guzzle\Service\Resource\Model;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Intercom\Intercom;
 use SilverStripe\Intercom\Model\Conversation;
 use SilverStripe\Intercom\Model\Lead;
 use SilverStripe\Control\HTTPRequest;
@@ -33,7 +34,7 @@ class ConnectLeadsAndConversations extends BuildTask
      */
     public function run($request)
     {
-        $client = Injector::inst()->get("SilverStripe\\Intercom\\Client");
+        $client = Injector::inst()->get(Intercom::class);
 
         $connectors = $this->getConnectors();
 

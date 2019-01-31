@@ -7,6 +7,7 @@ use SilverStripe\Dev\Debug;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Intercom\Intercom;
 
 class BulkLoadUsers extends BuildTask
 {
@@ -15,7 +16,7 @@ class BulkLoadUsers extends BuildTask
      */
     public function run($request)
     {
-        $intercom = Injector::inst()->get("SilverStripe\\Intercom\\Client");
+        $intercom = Injector::inst()->get(Intercom::class);
 
         if ($jobID = $request->getVar("JobID")) {
             $job = $intercom->getBulkJob($request->getVar("JobID"));

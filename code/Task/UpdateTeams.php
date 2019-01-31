@@ -5,6 +5,7 @@ namespace SilverStripe\Intercom\Task;
 use SilverStripe\Dev\BuildTask;
 use Guzzle\Service\Resource\Model;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Intercom\Intercom;
 use SilverStripe\Intercom\Model\Team;
 use SilverStripe\Control\HTTPRequest;
 
@@ -17,7 +18,7 @@ class UpdateTeams extends BuildTask
      */
     public function run($request)
     {
-        $client = Injector::inst()->get("SilverStripe\\Intercom\\Client");
+        $client = Injector::inst()->get(Intercom::class);
 
         /** @var Model $response */
         $response = $client->getClient()->getAdmins();

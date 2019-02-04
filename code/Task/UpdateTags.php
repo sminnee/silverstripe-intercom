@@ -21,26 +21,26 @@ class UpdateTags extends BuildTask
         $client = Injector::inst()->get(Intercom::class);
 
         /** @var Model $response */
-        $response = $client->getClient()->getTags();
-        $tags = $response->getPath("tags");
+        $response = $client->getClient()->tags->getTags();
+        $tags = $response->tags;
         $ids = [];
 
         foreach ($tags as $tag) {
-            $ids[] = $tag["id"];
+            $ids[] = $tag->id;
 
-            $existing = Tag::get()->filter("IntercomID", $tag["id"])->first();
+            $existing = Tag::get()->filter("IntercomID", $tag->id)->first();
 
             if (!$existing) {
-                $this->line("- creating record for " . $tag["name"]);
+                $this->line("- creating record for " . $tag->name);
 
                 $existing = Tag::create();
-                $existing->Type = $tag["type"];
-                $existing->IntercomID = $tag["id"];
+                $existing->Type = $tag->type;
+                $existing->IntercomID = $tag->id;
             } else {
-                $this->line("- updating record for " . $tag["name"]);
+                $this->line("- updating record for " . $tag->name);
             }
 
-            $existing->Name = $tag["name"];
+            $existing->Name = $tag->name;
             $existing->write();
         }
 

@@ -21,27 +21,27 @@ class UpdateTeams extends BuildTask
         $client = Injector::inst()->get(Intercom::class);
 
         /** @var Model $response */
-        $response = $client->getClient()->getAdmins();
-        $admins = $response->getPath("admins");
+        $response = $client->getClient()->admins->getAdmins();
+        $admins = $response->admins;
         $ids = [];
 
         foreach ($admins as $admin) {
-            $ids[] = $admin["id"];
+            $ids[] = $admin->id;
 
-            $existing = Team::get()->filter("IntercomID", $admin["id"])->first();
+            $existing = Team::get()->filter("IntercomID", $admin->id)->first();
 
             if (!$existing) {
-                $this->line("- creating record for " . $admin["name"]);
+                $this->line("- creating record for " . $admin->name);
 
                 $existing = Team::create();
-                $existing->Email = $admin["email"];
-                $existing->Type = $admin["type"];
-                $existing->IntercomID = $admin["id"];
+                $existing->Email = $admin->email;
+                $existing->Type = $admin->type;
+                $existing->IntercomID = $admin->id;
             } else {
-                $this->line("- updating record for " . $admin["name"]);
+                $this->line("- updating record for " . $admin->name);
             }
 
-            $existing->Name = $admin["name"];
+            $existing->Name = $admin->name;
             $existing->write();
         }
 

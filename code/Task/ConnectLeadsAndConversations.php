@@ -39,21 +39,21 @@ class ConnectLeadsAndConversations extends BuildTask
         $connectors = $this->getConnectors();
 
         /** @var Model $response */
-        $response = $client->getClient()->getContacts([
+        $response = $client->getClient()->leads->getLeads([
             "created_since" => 1,
         ]);
 
-        $contacts = $response->getPath("contacts");
+        $contacts = $response->contacts;
 
         foreach ($connectors as $connector) {
             foreach ($contacts as $i => $contact) {
                 $existingLead = Lead::get()
-                    ->filter("IntercomID", $contact["id"])
+                    ->filter("IntercomID", $contact->id)
                     ->first();
 
                 if (!$existingLead) {
                     $existingLead = Lead::create();
-                    $existingLead->IntercomID = $contact["id"];
+                    $existingLead->IntercomID = $contact->id;
                     $existingLead->IsAssigned = false;
                     $existingLead->write();
                 }
@@ -63,35 +63,37 @@ class ConnectLeadsAndConversations extends BuildTask
                 }
 
                 /** @var Model $response */
-                $response = $client->getClient()->getNotesForUser([
-                    "id" => $contact["id"],
+                $response = $client->getClient()->notes->getNotes([
+                    "id" => $contact->id,
                 ]);
 
-                $notes = $response->getPath("notes");
+                $notes = $response->notes;
 
-                if (!$connector->shouldConnect($contact, $notes)) {
+                $contactArray = json_decode(json_encode($contact), true);
+
+                if (!$connector->shouldConnect($contactArray, $notes)) {
                     continue;
                 }
 
                 $existingConversation = Conversation::get()
-                    ->filter("LeadID", $contact["id"])
+                    ->filter("LeadID", $contact->id)
                     ->first();
 
                 if (!$existingConversation) {
-                    $client->getClient()->createMessage([
-                        "body" => $connector->getMessage($contact, $notes),
+                    $client->getClient()->messages->create([
+                        "body" => $connector->getMessage($contactArray, $notes),
                         "from" => [
                             "type" => "contact",
-                            "id" => $contact["id"]
+                            "id" => $contact->id
                         ]
                     ]);
 
                     /** @var Model $response */
-                    $response = $client->getClient()->getConversations([
-                        "intercom_user_id" => $contact["id"],
+                    $response = $client->getClient()->conversations->getConversations([
+                        "intercom_user_id" => $contact->id,
                     ]);
 
-                    $conversations = $response->getPath("conversations");
+                    $conversations = $response->conversations;
 
                     $existingConversation = Conversation::create();
                     $existingConversation->LeadID = $existingLead->ID;
@@ -99,20 +101,20 @@ class ConnectLeadsAndConversations extends BuildTask
                     $existingConversation->write();
                 }
 
-                $client->getClient()->replyToConversation([
+                $client->getClient()->conversations->replyToConversation([
                     "id" => $existingConversation->IntercomID,
                     "type" => "admin",
                     "message_type" => "note",
                     "body" => join("\n\n", array_map(function ($note) {
-                        return $note["body"];
+                        return $note->body;
                     }, $notes)),
                     "admin_id" => $this->config()->assignment_admin_id,
                 ]);
 
-                $teamIdentifier = $connector->getTeamIdentifier($contact, $notes);
+                $teamIdentifier = $connector->getTeamIdentifier($contactArray, $notes);
 
                 if ($teamIdentifier) {
-                    $client->getClient()->replyToConversation([
+                    $client->getClient()->conversations->replyToConversation([
                         "id" => $existingConversation->IntercomID,
                         "type" => "admin",
                         "message_type" => "assignment",
@@ -121,14 +123,14 @@ class ConnectLeadsAndConversations extends BuildTask
                     ]);
                 }
 
-                $tags = $connector->getTags($contact, $notes);
+                $tags = $connector->getTags($contactArray, $notes);
 
                 if (!empty($tags)) {
                     foreach ($tags as $tag) {
-                        $client->getClient()->tagUsers([
+                        $client->getClient()->tags->tag([
                             "name" => $tag,
                             "users" => [
-                                ["id" => $contact["id"]],
+                                ["id" => $contact->id],
                             ],
                         ]);
                     }

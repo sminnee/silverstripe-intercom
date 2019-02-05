@@ -63,13 +63,15 @@ class ConnectLeadsAndConversations extends BuildTask
                 }
 
                 /** @var Model $response */
-                $response = $client->getClient()->getNotesForUser([
+                $response = $client->getClient()->notes->getNotes([
                     "id" => $contact->id,
                 ]);
 
                 $notes = $response->notes;
 
-                if (!$connector->shouldConnect($contact, $notes)) {
+                $contactArray = json_decode(json_encode($contact), true);
+
+                if (!$connector->shouldConnect($contactArray, $notes)) {
                     continue;
                 }
 
@@ -78,8 +80,8 @@ class ConnectLeadsAndConversations extends BuildTask
                     ->first();
 
                 if (!$existingConversation) {
-                    $client->getClient()->createMessage([
-                        "body" => $connector->getMessage($contact, $notes),
+                    $client->getClient()->messages->create([
+                        "body" => $connector->getMessage($contactArray, $notes),
                         "from" => [
                             "type" => "contact",
                             "id" => $contact->id
@@ -104,12 +106,12 @@ class ConnectLeadsAndConversations extends BuildTask
                     "type" => "admin",
                     "message_type" => "note",
                     "body" => join("\n\n", array_map(function ($note) {
-                        return $note["body"];
+                        return $note->body;
                     }, $notes)),
                     "admin_id" => $this->config()->assignment_admin_id,
                 ]);
 
-                $teamIdentifier = $connector->getTeamIdentifier($contact, $notes);
+                $teamIdentifier = $connector->getTeamIdentifier($contactArray, $notes);
 
                 if ($teamIdentifier) {
                     $client->getClient()->conversations->replyToConversation([
@@ -121,11 +123,11 @@ class ConnectLeadsAndConversations extends BuildTask
                     ]);
                 }
 
-                $tags = $connector->getTags($contact, $notes);
+                $tags = $connector->getTags($contactArray, $notes);
 
                 if (!empty($tags)) {
                     foreach ($tags as $tag) {
-                        $client->getClient()->tagUsers([
+                        $client->getClient()->tags->tag([
                             "name" => $tag,
                             "users" => [
                                 ["id" => $contact->id],

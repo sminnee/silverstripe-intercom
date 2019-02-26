@@ -32,11 +32,15 @@ class IntercomScriptTags extends ViewableData
             return false;
         }
 
+        if ($this->config()->always_anonymous) {
+            return true;
+        }
+
         if (!$member) {
             $member = Security::getCurrentUser();
         }
 
-        if (!$this->config()->anonymous_access && !$member) {
+        if (!$this->config()->anonymous_access && !$this->config()->always_anonymous && !$member) {
             return false;
         }
 
@@ -61,7 +65,10 @@ class IntercomScriptTags extends ViewableData
             'app_id' => Intercom::getSetting('INTERCOM_APP_ID'),
         ];
 
-        if (!$member) {
+        // always_anonymous prevents the use of $member
+        if ($this->config()->always_anonymous) {
+            $member = null;
+        } elseif (!$member) {
             $member = Security::getCurrentUser();
         }
 

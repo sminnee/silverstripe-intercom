@@ -59,6 +59,8 @@ SilverStripe\Intercom\IntercomScriptTags:
 
 - `anonymous_access`: If true, then the integration code will be supplied even for anonmyous visitors.
    This is used for Intercom Acquire.
+- `always_anonymous`: If true, then the integration code will never be populated with the details of the current user. Allows better caching.
+   This is used for Intercom Acquire.
 - `company_property`: The property on a member that points to their organisation
 - `company_fields`: A map of Intercom field name to organisation properties to pass through
 - `user_fields`: A map of Intercom field name to member properties to pass through

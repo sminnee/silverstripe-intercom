@@ -1,13 +1,3 @@
-SilverStripe\Core\Injector\Injector:
-  SilverStripe\Control\Director:
-    properties:
-      Middlewares:
-        IntercomMiddleware: %$SilverStripe\Intercom\IntercomMiddleware
-
-  SilverStripe\Intercom\IntercomMiddleware:
-    properties:
-      TagProvider: %$SilverStripe\Intercom\IntercomScriptTags
-
 SilverStripe\Intercom\Intercom:
   user_fields: ['type', 'user_id', 'email', 'id', 'signed_up_at',  'created_at','name', 'last_seen_ip', 'custom_attributes', 'last_seen_user_agent', 'last_request_at', 'unsubscribed_from_emails', 'update_last_request_at', 'new_session', 'company']
   lead_fields: ['type', 'user_id', 'email', 'id', 'updated_at',  'created_at', 'name', 'last_seen_ip', 'custom_attributes', 'last_seen_user_agent', 'last_request_at', 'unsubscribed_from_emails', 'update_last_request_at', 'social_profiles', 'companies', 'segments', 'tags']

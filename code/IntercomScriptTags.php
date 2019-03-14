@@ -3,44 +3,83 @@
 namespace SilverStripe\Intercom;
 
 use SilverStripe\Core\Convert;
+use SilverStripe\Core\Extensible;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
-use SilverStripe\View\ViewableData;
+
+use SilverStripe\TagManager\SnippetProvider;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms;
+use SilverStripe\View\ArrayData;
 
 /**
  * Generates the IntercomScriptTags.
  * Place into a template; forTemplate() returns the tag
  */
-class IntercomScriptTags extends ViewableData
+class IntercomScriptTags implements SnippetProvider
 {
-    /**
-     * @var bool
-     */
-    private static $enabled = true;
+
+    use Extensible;
+
+    public function getTitle()
+    {
+        return "Intercom chat";
+    }
+
+    public function getParamFields()
+    {
+        return new FieldList(
+            new Forms\TextField("AppId", "App ID"),
+            new Forms\TextField("SecretKey", "Secret Key"),
+            new Forms\DropdownField("AnonymousAccess", "Anonymous Access", [
+                'disabled' => 'Disabled (logged-in members only)',
+                'allowed' => 'Allowed',
+                'forced' => 'Forced (logged-in member will be ignored)',
+            ], 'allowed')
+        );
+    }
+
+    public function getSummary(array $params)
+    {
+        if (!empty($params['AppId'])) {
+            return $this->getTitle() . " -  App ID " . $params['AppId'];
+        } else {
+            return $this->getTitle();
+        }
+    }
+
+    public function getSnippets(array $params)
+    {
+        if (empty($params['AppId'])) {
+            throw new \InvalidArgumentException("Please supply App ID");
+        }
+
+        if (!$this->isEnabled($params)) {
+            return [];
+        }
+
+
+        $snippet = (new ArrayData([
+            'IntercomSettingsJSON' => Convert::raw2json($this->getIntercomSettings($params)),
+        ]))->renderWith(__CLASS__);
+
+        return [
+            'end-body' => $snippet,
+        ];
+    }
 
     /**
      * @param  Member $member
      * @return bool
      */
-    public function isEnabled(Member $member = null)
+    public function isEnabled(array $params, Member $member = null)
     {
-        if (!Intercom::getSetting('INTERCOM_APP_ID')) {
-            return false;
-        }
-
-        if (!$this->config()->enabled) {
-            return false;
-        }
-
-        if ($this->config()->always_anonymous) {
-            return true;
-        }
-
         if (!$member) {
             $member = Security::getCurrentUser();
         }
 
-        if (!$this->config()->anonymous_access && !$this->config()->always_anonymous && !$member) {
+        // If there's no member and anonymous access isn't allowed, don't let the person in
+        if (isset($params['AnonymousAccess']) && $params['AnonymousAccess'] === 'disabled' && !$member) {
             return false;
         }
 
@@ -55,18 +94,19 @@ class IntercomScriptTags extends ViewableData
      *
      * @return array The settings, ready for JSON-encoding
      */
-    public function getIntercomSettings(Member $member = null)
+    protected function getIntercomSettings(array $params, Member $member = null)
     {
-        if (!$this->isEnabled($member)) {
+
+        if (!$this->isEnabled($params, $member)) {
             return [];
         }
 
         $settings = [
-            'app_id' => Intercom::getSetting('INTERCOM_APP_ID'),
+            'app_id' => $params['AppId'],
         ];
 
         // always_anonymous prevents the use of $member
-        if ($this->config()->always_anonymous) {
+        if (isset($params['AnonymousAccess']) && $params['AnonymousAccess'] === 'forced') {
             $member = null;
         } elseif (!$member) {
             $member = Security::getCurrentUser();
@@ -78,12 +118,13 @@ class IntercomScriptTags extends ViewableData
             $settings['created_at'] = trim($member->FirstName . ' ' . $member->Surname);
             $settings['created_at'] = $member->obj('Created')->Format('U');
 
-            foreach ((array)$this->config()->user_fields as $intercomKey => $propertyName) {
-                $settings[$intercomKey] = $member->$propertyName;
-            }
+            // TO DO
+            // foreach ((array)$this->config()->user_fields as $intercomKey => $propertyName) {
+            //     $settings[$intercomKey] = $member->$propertyName;
+            // }
 
-            if (Intercom::getSetting('INTERCOM_SECRET_KEY')) {
-                $settings['user_hash'] = $this->generateUserHash($member->Email);
+            if (!empty($params['SecretKey'])) {
+                $settings['user_hash'] = $this->generateUserHash($member->Email, $params['SecretKey']);
             } else {
                 $settings['user_id'] = $member->ID;
             }
@@ -112,27 +153,9 @@ class IntercomScriptTags extends ViewableData
      * @param  string $identifier
      * @return string|null
      */
-    public function generateUserHash($identifier)
+    public function generateUserHash($identifier, $secret)
     {
-        if ($secret = Intercom::getSetting('INTERCOM_SECRET_KEY')) {
-            return hash_hmac("sha256", $identifier, $secret);
-        }
+        return hash_hmac("sha256", $identifier, $secret);
     }
 
-    /**
-     * @return string JSON
-     */
-    public function IntercomSettingsJSON()
-    {
-        return Convert::raw2json($this->getIntercomSettings());
-    }
-
-    public function forTemplate()
-    {
-        if (!$this->isEnabled()) {
-            return null;
-        }
-
-        return $this->renderWith(__CLASS__);
-    }
 }

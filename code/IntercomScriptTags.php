@@ -4,6 +4,7 @@ namespace SilverStripe\Intercom;
 
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 
@@ -20,6 +21,7 @@ class IntercomScriptTags implements SnippetProvider
 {
 
     use Extensible;
+    use Configurable;
 
     public function getTitle()
     {
